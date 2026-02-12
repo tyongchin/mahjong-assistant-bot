@@ -3,8 +3,7 @@ import { getActiveSessionId, listPlayers } from "../db/sessions";
 import { shuffle } from "../utils/math";
 import { formatName } from "../utils/format";
 
-
-export async function cmdAssignTables(env: Env, chatId: string): Promise<string> {
+export async function cmdShuffleTables(env: Env, chatId: string): Promise<string> {
   const sessionId = await getActiveSessionId(env, chatId);
   if (sessionId === null) return "No active session. Start one with /newgame.";
 

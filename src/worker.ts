@@ -13,7 +13,7 @@ import { cmdLeave } from "./commands/leave";
 import { cmdStatus } from "./commands/status";
 import { cmdAdd } from "./commands/add";
 import { cmdRemove } from "./commands/remove";
-import { cmdAssignTables } from "./commands/assigntables";
+import { cmdShuffleTables } from "./commands/shuffletables";
 import { cmdResultSubmit } from "./commands/resultsubmit";
 import { cmdResultFinalize } from "./commands/resultfinalize";
 
@@ -52,12 +52,12 @@ export default {
     const username = msg.from.username ? String(msg.from.username) : null;
     const displayName = makeDisplayName(msg.from);
 
-    let reply: string;
+    let reply: string | string[];
 
     try {
       switch (command) {
         case "newgame":
-          reply = await cmdNewGame(env, chatId, userId);
+          reply = await cmdNewGame(env, chatId, userId, text);
           break;
         case "endgame":
           reply = await cmdEndGame(env, chatId);
@@ -77,8 +77,8 @@ export default {
         case "remove":
           reply = await cmdRemove(env, chatId, text);
           break;
-        case "assigntables":
-          reply = await cmdAssignTables(env, chatId);
+        case "shuffletables":
+          reply = await cmdShuffleTables(env, chatId);
           break;
         case "resultsubmit":
           reply = await cmdResultSubmit(env, chatId, text);
@@ -94,14 +94,29 @@ export default {
             "/leave - leave session\n" +
             "/status - show current players\n" +
             "/add - add player\n" +
-            "/remove - remove player";
+            "/remove - remove player\n" +
+            "/shuffletables - assign tables\n" +
+            "/resultsubmit - submit results\n" +
+            "/endgame - end session";
+          break;
       }
     } catch (e) {
       console.log("Command error:", e);
       reply = "Something went wrong 😵‍💫";
     }
 
-    ctx.waitUntil(sendMessage(env, msg.chat.id, reply));
+    ctx.waitUntil(
+      (async () => {
+        if (Array.isArray(reply)) {
+          for (const r of reply) {
+            await sendMessage(env, msg.chat.id, r);
+          }
+        } else {
+          await sendMessage(env, msg.chat.id, reply);
+        }
+      })()
+    );
+    
     return new Response("ok", { status: 200 });
   },
 };
