@@ -33,9 +33,9 @@ export function makeDisplayName(from: TgUser): string {
 
 export function parseSubmit(rawText: string): ParsedLine[] {
     const lines = rawText
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
 
     if (lines.length === 0) return [];
 
@@ -47,11 +47,14 @@ export function parseSubmit(rawText: string): ParsedLine[] {
     for (let i = 1; i < lines.length; i++) {
         const line = lines[i];
 
-        // username + integer (optional +/-)
-        const m = line.match(/^@?([A-Za-z0-9_]{5,})\s+([+-]?\d+)$/);
+        // Accept:
+        //   tim 5
+        //   @tim -3
+        // Username token is 1+ chars (letters/digits/_), delta is integer (+ optional)
+        const m = line.match(/^@?([A-Za-z0-9_]{1,})\s+([+-]?\d+)$/);
         if (!m) continue;
 
-        const username = normalizeUsername(m[1]);
+        const username = normalizeUsername(m[1]); // strips/normalizes case etc
         const delta = parseInt(m[2], 10);
         out.push({ username, delta });
     }

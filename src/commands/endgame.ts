@@ -28,7 +28,7 @@ export async function cmdEndGame(
     `/resultsubmit\n` +
     players.map(p => {
       const name = p.username
-        ? `@${p.username}`
+        ? `${p.username}`
         : (p.display_name ?? "Unknown");
       return `${name} 0`;
     }).join("\n");
