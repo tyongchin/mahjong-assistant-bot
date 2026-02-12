@@ -74,26 +74,23 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
         }))
     );
 
-    let out = `📌 Finalizing session #${sessionId}\n`;
+    let out = `📌 Finalizing session #${sessionId}`;
 
-    out += `\nDraft net (raw): ${formatSigned(net)}\n`;
-    if (autoBalanceResult.note) out += `${autoBalanceResult.note}\n`;
-
-    out += `\nResults (raw):\n`;
+    out += `\n\nResults:\n`;
     for (const p of sessionPlayers) {
         const name = p.username ? `@${p.username}` : (p.display_name ?? "Unknown");
         const delta = byUserId.get(p.user_id);
         out += `- ${name}: ${delta === undefined ? "(not provided)" : formatSigned(delta)}\n`;
     }
 
-    out += `\nSettlement:\n`;
+    out += `\n\nSettlement:\n`;
     if (transfers.length === 0) {
         out += `(No transfers needed)\n`;
     } else {
         for (const t of transfers) out += `- ${t.from} pays ${t.to} ${t.amount}\n`;
     }
 
-    out += `\n📈 Leaderboard update:\n`;
+    out += `\n\n📈 Leaderboard update:\n`;
     for (const d of deltas) {
         const nm = d.username ? `@${d.username}` : (d.displayName ?? "Unknown");
         out += `- ${nm}: ${formatSigned(d.deltaPoints)}\n`;
@@ -108,6 +105,5 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
     await clearDraft(env, sessionId);
     await clearResultState(env, chatId);
 
-    out += `\nSession ended ✅\nDraft cleared ✅`;
     return out.trimEnd();
 }
