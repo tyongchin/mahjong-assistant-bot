@@ -13,5 +13,5 @@ export async function cmdStatus(env: Env, chatId: string): Promise<string> {
     return `${i + 1}. ${name}`;
   });
 
-  return `🎴 Session #${sessionId} (active)\nPlayers:\n${lines.join("\n")}`;
+  return `🀄 Session #${sessionId} (active)\nPlayers:\n${lines.join("\n")}`;
 }

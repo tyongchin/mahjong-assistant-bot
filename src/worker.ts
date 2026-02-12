@@ -8,6 +8,8 @@ import { cmdNewGame } from "./commands/newgame";
 import { cmdJoin } from "./commands/join";
 import { cmdLeave } from "./commands/leave";
 import { cmdStatus } from "./commands/status";
+import { cmdAdd } from "./commands/add";
+import { cmdRemove } from "./commands/remove";
 
 import type { ExecutionContext } from "@cloudflare/workers-types";
 
@@ -62,13 +64,21 @@ export default {
         case "status":
           reply = await cmdStatus(env, chatId);
           break;
+        case "add":
+          reply = await cmdAdd(env, chatId, text);
+          break;
+        case "remove":
+          reply = await cmdRemove(env, chatId, text);
+          break;
         default:
           reply =
             "Commands:\n" +
             "/newgame - start a session\n" +
             "/join - join session\n" +
             "/leave - leave session\n" +
-            "/status - show current players";
+            "/status - show current players\n" +
+            "/add - add player\n" +
+            "/remove - remove player";
       }
     } catch (e) {
       console.log("Command error:", e);

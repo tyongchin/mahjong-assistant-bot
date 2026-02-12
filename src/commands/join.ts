@@ -9,10 +9,10 @@ export async function cmdJoin(
   displayName: string
 ): Promise<string> {
   const sessionId = await getActiveSessionId(env, chatId);
-  if (sessionId === null) return "No active session. Start one with /newgame.";
+  if (sessionId === null) return "No active session. 😭";
 
   await addPlayerToSession(env, sessionId, userId, username, displayName);
   const c = await countPlayers(env, sessionId);
 
-  return `✅ Joined session #${sessionId}.\nCurrent players: ${c}\nUse /status to see the list.`;
+  return `🥳 Joined session #${sessionId}.\nCurrent players: ${c}\nUse /status to see the list.`;
 }
