@@ -1,9 +1,9 @@
 import type { Env } from "../types/env";
 import { getResultState, clearDraft, writeDraft, sumDraft } from "../db/results";
 import { listPlayers } from "../db/sessions";
-import { getUserIdByUsername, normalizeUsername } from "../db/players";
-
-type ParsedLine = { username: string; delta: number };
+import { getUserIdByUsername } from "../db/players";
+import { formatName, formatSigned } from "../utils/format";
+import { parseSubmit } from "../utils/parse";
 
 export async function cmdResultSubmit(env: Env, chatId: string, rawText: string): Promise<string> {
   const state = await getResultState(env, chatId);
@@ -40,11 +40,11 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
   for (const line of parsed) {
     const userId = await getUserIdByUsername(env, line.username);
     if (!userId) {
-      unknownUsers.push(`@${line.username}`);
+      unknownUsers.push(formatName({ user_id: "", username: line.username, display_name: null }));
       continue;
     }
     if (!expectedUserIds.has(userId)) {
-      notInSession.push(`@${line.username}`);
+      notInSession.push(formatName({ user_id: userId, username: line.username, display_name: null }));
       continue;
     }
     rowsToInsert.push({ userId, delta: line.delta });
@@ -60,7 +60,7 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
   const provided = new Set(rowsToInsert.map((r) => r.userId));
   const missing = sessionPlayers
     .filter((p) => !provided.has(p.user_id))
-    .map((p) => (p.username ? `@${p.username}` : (p.display_name ?? "Unknown")));
+    .map((p) => formatName(p));
 
   let out = `✅ Draft results saved for session #${sessionId}.\n`;
 
@@ -89,44 +89,4 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
   }
 
   return out.trimEnd();
-}
-
-// Parses:
-/*
-/resultsubmit
-@alice 12
-@bob -8
-charlie -4
-david 0
-*/
-function parseSubmit(rawText: string): ParsedLine[] {
-  const lines = rawText
-    .split("\n")
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  if (lines.length === 0) return [];
-
-  const head = lines[0].split(/\s+/)[0];
-  if (!head.startsWith("/resultsubmit")) return [];
-
-  const out: ParsedLine[] = [];
-
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-
-    // username + integer (optional +/-)
-    const m = line.match(/^@?([A-Za-z0-9_]{5,})\s+([+-]?\d+)$/);
-    if (!m) continue;
-
-    const username = normalizeUsername(m[1]);
-    const delta = parseInt(m[2], 10);
-    out.push({ username, delta });
-  }
-
-  return out;
-}
-
-function formatSigned(x: number): string {
-  return x >= 0 ? `+${x}` : `${x}`;
 }

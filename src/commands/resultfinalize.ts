@@ -2,9 +2,9 @@ import type { Env } from "../types/env";
 import { getResultState, getDraft, sumDraft, clearDraft, clearResultState } from "../db/results";
 import { listPlayers } from "../db/sessions";
 import { computeSettlementMinTransfers } from "../settlement/settle";
+import { autoBalanceToZero } from "../settlement/autobalance";
 import { formatSigned } from "../utils/format";
 import type { BalanceEntry } from "../types/domain";
-import { autoBalanceToZero } from "../settlement/autobalance";
 
 export async function cmdResultFinalize(env: Env, chatId: string): Promise<string> {
   const state = await getResultState(env, chatId);

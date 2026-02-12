@@ -16,6 +16,14 @@ export function parseSingleUsernameArg(rawText: string): string | null {
   return parts[1];
 }
 
+export function parseTitle(rawText: string): string | null {
+  const parts = rawText.trim().split(/\s+/);
+  if (parts.length <= 1) return null;
+
+  // Remove "/newgame" (first word) and join the rest
+  return rawText.trim().substring(rawText.indexOf(" ") + 1).trim();
+}
+
 export function makeDisplayName(from: TgUser): string {
   const first = from.first_name ?? "";
   const last = from.last_name ?? "";
