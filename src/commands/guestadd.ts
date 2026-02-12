@@ -4,24 +4,30 @@ import { createOrGetVirtualPlayer } from "../db/players";
 import { getResultState } from "../db/results";
 
 export async function cmdGuestAdd(env: Env, chatId: string, rawText: string): Promise<string> {
-  const sessionId = await getActiveSessionId(env, chatId);
-  if (sessionId === null) return "No active session.";
+    const sessionId = await getActiveSessionId(env, chatId);
+    if (sessionId === null) return "No active session.";
 
-  // block during results phase
-  const state = await getResultState(env, chatId);
-  if (state && state.session_id === sessionId) return "Game is in results phase. Cannot add guests now.";
+    // block during results phase
+    const state = await getResultState(env, chatId);
+    if (state && state.session_id === sessionId) return "Game is in results phase. Cannot add guests now.";
 
-  const parts = rawText.trim().split(/\s+/);
-  if (parts.length < 2) return "Usage: /guestadd Name";
+    const parts = rawText.trim().split(/\s+/);
 
-  const name = parts.slice(1).join(" ").trim();
-  if (!name) return "Usage: /guestadd Name";
+    // Must be exactly: /guestadd <name>
+    if (parts.length !== 2) {
+        return "Usage: /guestadd <name> (one word only, no spaces)";
+    }
 
-  const guest = await createOrGetVirtualPlayer(env, chatId, name);
+    const name = parts[1].trim();
+    if (!name) return "Usage: /guestadd <name> (one word only, no spaces)";
 
-  // store guest.username in `username` column (no @), display_name is also set
-  await addPlayerToSession(env, sessionId, guest.userId, guest.username, guest.displayName);
-  const c = await countPlayers(env, sessionId);
+    // Optional: disallow @ prefix
+    const cleaned = name.startsWith("@") ? name.slice(1) : name;
 
-  return `✅ Added guest "${guest.displayName}" to session #${sessionId}.\nCurrent players: ${c}`;
+    const guest = await createOrGetVirtualPlayer(env, chatId, cleaned);
+
+    await addPlayerToSession(env, sessionId, guest.userId, guest.username, guest.displayName);
+    const c = await countPlayers(env, sessionId);
+
+    return `✅ Added guest "${guest.displayName}" to session #${sessionId}.\nCurrent players: ${c}`;
 }
