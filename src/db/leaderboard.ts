@@ -1,4 +1,5 @@
 import type { Env } from "../types/env";
+import { normalizeUsername } from "./players";
 
 export async function applyPointsBatch(
     env: Env,
@@ -31,7 +32,7 @@ export async function applyPointsBatch(
         ).bind(
         chatId,
         r.user_id,
-        r.username,
+        normalizeUsername(r.username ?? ""),
         r.display_name,
         r.delta,   // 0 is allowed (will just refresh updated_at)
         now

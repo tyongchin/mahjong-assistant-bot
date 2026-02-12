@@ -18,10 +18,11 @@ import { cmdRemove } from "./commands/remove";
 import { cmdShuffleTables } from "./commands/shuffletables";
 import { cmdResultSubmit } from "./commands/resultsubmit";
 import { cmdResultFinalize } from "./commands/resultfinalize";
-import { cmdSetPoints } from "./commands/setpoints";
+import { cmdSetPoints } from "./commands/admin/setpoints";
 import { cmdLeaderboard } from "./commands/leaderboard";
 import { cmdGuestAdd } from "./commands/guestadd";
 import { cmdGuestRemove } from "./commands/guestremove";
+import { cmdRemoveFromLb } from "./commands/admin/removefromlb";
 
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -66,7 +67,7 @@ export default {
         const username = msg.from.username ? String(msg.from.username) : null;
         const displayName = makeDisplayName(msg.from);
 
-        let reply: string | string[];
+        let reply: string | string[] | null = null;
 
         try {
             switch (command) {
@@ -103,47 +104,41 @@ export default {
             case "leaderboard":
                 reply = await cmdLeaderboard(env, chatId);
                 break;
-            case "setpoints":
-                reply = await cmdSetPoints(env, chatId, userId, text);
-                break;
             case "guestadd":
                 reply = await cmdGuestAdd(env, chatId, text);
                 break;
             case "guestremove":
                 reply = await cmdGuestRemove(env, chatId, text);
                 break;
+            // Admin commands
+            case "setpoints":
+                reply = await cmdSetPoints(env, chatId, userId, text);
+                break;
+            case "removefromlb":
+                reply = await cmdRemoveFromLb(env, chatId, userId, text);
+                break;
             default:
-                reply =
-                "Commands:\n" +
-                "/newgame - start a session\n" +
-                "/join - join session\n" +
-                "/leave - leave session\n" +
-                "/status - show current players for session\n" +
-                "/add - add player\n" +
-                "/remove - remove player\n" +
-                "/shuffletables - shuffle tables\n" +
-                "/resultsubmit - submit results\n" +
-                "/endgame - end session" +"\n" +
-                "/leaderboard - show leaderboard";
+                reply = null;
                 break;
             }
         } catch (e) {
             console.log("Command error:", e);
             reply = "Something went wrong 😵‍💫";
         }
-
-        ctx.waitUntil(
-            (async () => {
-            if (Array.isArray(reply)) {
-                for (const r of reply) {
-                await sendMessage(env, msg.chat.id, r);
-                }
-            } else {
-                await sendMessage(env, msg.chat.id, reply);
-            }
-            })()
-        );
         
+        if (reply !== null) {
+            ctx.waitUntil(
+                (async () => {
+                if (Array.isArray(reply)) {
+                    for (const r of reply) {
+                    await sendMessage(env, msg.chat.id, r);
+                    }
+                } else {
+                    await sendMessage(env, msg.chat.id, reply);
+                }
+                })()
+            );
+        }
         return new Response("ok", { status: 200 });
     },
 
