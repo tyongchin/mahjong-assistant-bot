@@ -1,6 +1,6 @@
 name = "mahjong-assistant-bot"
 main = "src/worker.ts"
-compatibility_date = "2026-02-10"
+compatibility_date = "2026-02-12"
 
 [observability]
 enabled = false
@@ -24,3 +24,6 @@ database_id = "70208ae3-0079-49e3-8ebc-6930b25feb62"
 
 [triggers]
 crons = ["0 16 * * 1"]
+
+[vars]
+ADMIN_USER_IDS = "209027025"

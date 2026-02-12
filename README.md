@@ -198,6 +198,9 @@ database_id = "YOUR_DB_ID"
 
 [triggers]
 crons = ["0 0 * * 0"] # Weekly
+
+[vars]
+ADMIN_USER_IDS = "TELEGRAM_ADMIN_ID"
 ```
 
 ---
