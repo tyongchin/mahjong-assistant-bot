@@ -24,11 +24,11 @@ export async function cmdRemove(
     const targetUserId = await getUserIdByUsername(env, uname);
 
     if (!targetUserId) {
-        return `I don't recognize @${uname} yet, so I can't remove them by username.`;
+        return `I don't recognize ${uname} yet, so I can't remove them by username.`;
     }
 
     const removed = await removePlayerFromSession(env, sessionId, targetUserId);
-    if (removed === 0) return `@${uname} is not in the current session.`;
+    if (removed === 0) return `${uname} is not in the current session.`;
 
     const c = await countPlayers(env, sessionId);
 

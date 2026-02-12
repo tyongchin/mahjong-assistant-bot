@@ -23,4 +23,4 @@ database_name = "mahjong_assistant_bot"
 database_id = "70208ae3-0079-49e3-8ebc-6930b25feb62"
 
 [triggers]
-crons = ["0 20 * * 0"]
+crons = ["0 20 * * 1"]

@@ -10,8 +10,8 @@ import { BalanceEntry, PointsDelta } from "../types/domain.ts";
  * - top loser(s) get -1 extra (total -2)
  */
 export function computeSessionPointsFromBalances(
-  balances: BalanceEntry[],
-  resolveUserMeta: (id: string) => { username: string | null; displayName: string | null }
+    balances: BalanceEntry[],
+    resolveUserMeta: (id: string) => { username: string | null; display_name: string | null }
 ): PointsDelta[] {
     const winners = balances.filter(b => b.balance > 0);
     const losers  = balances.filter(b => b.balance < 0);
@@ -21,10 +21,10 @@ export function computeSessionPointsFromBalances(
     for (const b of balances) {
         const meta = resolveUserMeta(b.id);
         map.set(b.id, {
-        userId: b.id,
+        user_id: b.id,
         username: meta.username,
-        displayName: meta.displayName,
-        deltaPoints: 0,
+        display_name: meta.display_name,
+        delta_points: 0,
         reason: "played(0)"
         });
     }
@@ -32,13 +32,13 @@ export function computeSessionPointsFromBalances(
     // Base points
     for (const w of winners) {
         const cur = map.get(w.id)!;
-        cur.deltaPoints += 1;
+        cur.delta_points += 1;
         cur.reason = "winner(+1)";
     }
 
     for (const l of losers) {
         const cur = map.get(l.id)!;
-        cur.deltaPoints -= 1;
+        cur.delta_points -= 1;
         cur.reason = "loser(-1)";
     }
 
@@ -47,7 +47,7 @@ export function computeSessionPointsFromBalances(
         const max = Math.max(...winners.map(w => w.balance));
         for (const tw of winners.filter(w => w.balance === max)) {
         const cur = map.get(tw.id)!;
-        cur.deltaPoints += 1;
+        cur.delta_points += 1;
         cur.reason += cur.reason.includes("winner") ? ",topWinnerBonus(+1)" : "topWinnerBonus(+1)";
         }
     }
@@ -57,7 +57,7 @@ export function computeSessionPointsFromBalances(
         const min = Math.min(...losers.map(l => l.balance));
         for (const tl of losers.filter(l => l.balance === min)) {
         const cur = map.get(tl.id)!;
-        cur.deltaPoints -= 1;
+        cur.delta_points -= 1;
         cur.reason += cur.reason.includes("loser") ? ",topLoserBonus(-1)" : "topLoserBonus(-1)";
         }
     }

@@ -1,9 +1,15 @@
 import type { Player } from "../types/domain";
+import type { SessionPlayerRow } from "../db/sessions";
+import type { PointsDelta } from "../types/domain";
 
 export function formatSigned(x: number): string {
-  return x >= 0 ? `+${x}` : `${x}`;
+    return x >= 0 ? `+${x}` : `${x}`;
 }
 
-export function formatName(p: Player): string {
-  return p.username ? `@${p.username}` : (p.display_name ?? "Unknown");
+type NameLike = {
+  username: string | null;
+  display_name: string | null;
+};
+export function formatName(p: NameLike): string {
+  return p.display_name ?? (p.username ? p.username : "Unknown");
 }

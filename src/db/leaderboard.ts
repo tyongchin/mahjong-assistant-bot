@@ -1,16 +1,16 @@
 import type { Env } from "../types/env";
 
 export async function applyPointsBatch(
-  env: Env,
-  chatId: string,
-  sessionId: number,
-  rows: Array<{
-    userId: string;
-    username: string | null;
-    displayName: string | null;
-    delta: number;     // point change (can be 0)
-    reason: string;    // explanation (only logged if delta != 0)
-  }>
+    env: Env,
+    chatId: string,
+    sessionId: number,
+    rows: Array<{
+        user_id: string;
+        username: string | null;
+        display_name: string | null;
+        delta: number;     // point change (can be 0)
+        reason: string;    // explanation (only logged if delta != 0)
+    }>
 ): Promise<void> {
     if (rows.length === 0) return;
 
@@ -30,9 +30,9 @@ export async function applyPointsBatch(
         `
         ).bind(
         chatId,
-        r.userId,
+        r.user_id,
         r.username,
-        r.displayName,
+        r.display_name,
         r.delta,   // 0 is allowed (will just refresh updated_at)
         now
         );
@@ -51,7 +51,7 @@ export async function applyPointsBatch(
         ).bind(
         chatId,
         sessionId,
-        r.userId,
+        r.user_id,
         r.delta,
         r.reason,
         now

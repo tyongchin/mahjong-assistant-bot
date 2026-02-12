@@ -1,4 +1,5 @@
 import type { Env } from "../types/env";
+import type { Player } from "../types/domain";
 import { getResultState, setResultState, clearDraft, writeDraft, sumDraft } from "../db/results";
 import { listPlayers, getActiveSessionId } from "../db/sessions";
 import { getUserIdByUsername } from "../db/players";
@@ -33,10 +34,10 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
         return (
         "Usage:\n" +
         "/resultsubmit\n" +
-        "@alice 12\n" +
-        "@bob -8\n" +
-        "@charlie -4\n" +
-        "@david 0"
+        "alice 12\n" +
+        "bob -8\n" +
+        "charlie -4\n" +
+        "david 0"
         );
     }
 
@@ -49,12 +50,14 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
     for (const line of parsed) {
         const userId = await getUserIdByUsername(env, line.username);
         if (!userId) {
-        unknownUsers.push(formatName({ user_id: "", username: line.username, display_name: null }));
-        continue;
+            const p: Player = { user_id: "", username: line.username, display_name: null };
+            unknownUsers.push(formatName(p));
+            continue;
         }
         if (!expectedUserIds.has(userId)) {
-        notInSession.push(formatName({ user_id: userId, username: line.username, display_name: null }));
-        continue;
+            const p: Player = { user_id: userId, username: line.username, display_name: null };
+            notInSession.push(formatName(p));
+            continue;
         }
         rowsToInsert.push({ userId, delta: line.delta });
     }

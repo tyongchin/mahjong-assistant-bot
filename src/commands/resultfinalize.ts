@@ -1,10 +1,10 @@
 import type { Env } from "../types/env";
+import type { BalanceEntry } from "../types/domain";
 import { getResultState, setResultState, getDraft, sumDraft, clearDraft, clearResultState } from "../db/results";
 import { listPlayers, getActiveSessionId } from "../db/sessions";
 import { computeSettlementMinTransfers } from "../settlement/settle";
 import { autoBalanceToZero } from "../settlement/autobalance";
-import { formatSigned } from "../utils/format";
-import type { BalanceEntry } from "../types/domain";
+import { formatName, formatSigned } from "../utils/format";
 import { computeSessionPointsFromBalances } from "../leaderboard/points";
 import { applyPointsBatch } from "../db/leaderboard";
 
@@ -56,8 +56,8 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
     const deltas = computeSessionPointsFromBalances(
         adjustedEntries,
         (id) => {
-        const p = sessionPlayers.find(sp => sp.user_id === id);
-        return { username: p?.username ?? null, displayName: p?.display_name ?? null };
+            const p = sessionPlayers.find(sp => sp.user_id === id);
+            return { username: p?.username ?? null, display_name: p?.display_name ?? null };
         }
     );
 
@@ -66,10 +66,10 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
         chatId,
         sessionId,
         deltas.map(d => ({
-        userId: d.userId,
+        user_id: d.user_id,
         username: d.username,
-        displayName: d.displayName,
-        delta: d.deltaPoints,
+        display_name: d.display_name,
+        delta: d.delta_points,
         reason: d.reason
         }))
     );
@@ -78,7 +78,7 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
 
     out += `\n\nResults:\n`;
     for (const p of sessionPlayers) {
-        const name = p.username ? `${p.username}` : (p.display_name ?? "Unknown");
+        const name = formatName(p);
         const delta = byUserId.get(p.user_id);
         out += `- ${name}: ${delta === undefined ? "(not provided)" : formatSigned(delta)}\n`;
     }
@@ -86,14 +86,15 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
     out += `\n\nSettlement:\n`;
     if (transfers.length === 0) {
         out += `(No transfers needed)\n`;
-    } else {
+    } 
+    else {
         for (const t of transfers) out += `- ${t.from} pays ${t.to} ${t.amount}\n`;
     }
 
     out += `\n\n📈 Leaderboard update:\n`;
     for (const d of deltas) {
-        const nm = d.username ? `${d.username}` : (d.displayName ?? "Unknown");
-        out += `- ${nm}: ${formatSigned(d.deltaPoints)}\n`;
+        const nm = formatName(d);
+        out += `- ${nm}: ${formatSigned(d.delta_points)}\n`;
     }
 
     // END THE SESSION HERE (single source of truth)
