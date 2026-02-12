@@ -40,7 +40,7 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
     // Build balances (raw from draft; missing treated as 0)
     const entries: BalanceEntry[] = [];
     for (const p of sessionPlayers) {
-        const name = p.username ? `@${p.username}` : (p.display_name ?? "Unknown");
+        const name = p.username ? `${p.username}` : (p.display_name ?? "Unknown");
         const delta = byUserId.get(p.user_id) ?? 0;
         entries.push({ id: p.user_id, name, balance: delta });
     }
@@ -78,7 +78,7 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
 
     out += `\n\nResults:\n`;
     for (const p of sessionPlayers) {
-        const name = p.username ? `@${p.username}` : (p.display_name ?? "Unknown");
+        const name = p.username ? `${p.username}` : (p.display_name ?? "Unknown");
         const delta = byUserId.get(p.user_id);
         out += `- ${name}: ${delta === undefined ? "(not provided)" : formatSigned(delta)}\n`;
     }
@@ -92,7 +92,7 @@ export async function cmdResultFinalize(env: Env, chatId: string): Promise<strin
 
     out += `\n\n📈 Leaderboard update:\n`;
     for (const d of deltas) {
-        const nm = d.username ? `@${d.username}` : (d.displayName ?? "Unknown");
+        const nm = d.username ? `${d.username}` : (d.displayName ?? "Unknown");
         out += `- ${nm}: ${formatSigned(d.deltaPoints)}\n`;
     }
 
