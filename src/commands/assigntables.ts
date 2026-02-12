@@ -1,11 +1,8 @@
 import type { Env } from "../types/env";
 import { getActiveSessionId, listPlayers } from "../db/sessions";
+import { shuffle } from "../utils/math";
+import { formatName } from "../utils/format";
 
-type Player = {
-  user_id: string;
-  username: string | null;
-  display_name: string | null;
-};
 
 export async function cmdAssignTables(env: Env, chatId: string): Promise<string> {
   const sessionId = await getActiveSessionId(env, chatId);
@@ -43,8 +40,4 @@ export async function cmdAssignTables(env: Env, chatId: string): Promise<string>
   }
 
   return output.trimEnd();
-}
-
-function formatName(p: Player): string {
-  return p.username ? `@${p.username}` : (p.display_name ?? "Unknown");
 }

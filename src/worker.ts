@@ -1,3 +1,5 @@
+import type { ExecutionContext } from "@cloudflare/workers-types";
+
 import type { Env } from "./types/env";
 import type { TgUpdate } from "./types/telegram";
 
@@ -5,13 +7,15 @@ import { parseCommand, makeDisplayName } from "./utils/parse";
 import { sendMessage } from "./telegram/api";
 
 import { cmdNewGame } from "./commands/newgame";
+import { cmdEndGame } from "./commands/endgame";
 import { cmdJoin } from "./commands/join";
 import { cmdLeave } from "./commands/leave";
 import { cmdStatus } from "./commands/status";
 import { cmdAdd } from "./commands/add";
 import { cmdRemove } from "./commands/remove";
-
-import type { ExecutionContext } from "@cloudflare/workers-types";
+import { cmdAssignTables } from "./commands/assigntables";
+import { cmdResultSubmit } from "./commands/resultsubmit";
+import { cmdResultFinalize } from "./commands/resultfinalize";
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -55,6 +59,9 @@ export default {
         case "newgame":
           reply = await cmdNewGame(env, chatId, userId);
           break;
+        case "endgame":
+          reply = await cmdEndGame(env, chatId);
+          break;
         case "join":
           reply = await cmdJoin(env, chatId, userId, username, displayName);
           break;
@@ -69,6 +76,15 @@ export default {
           break;
         case "remove":
           reply = await cmdRemove(env, chatId, text);
+          break;
+        case "assigntables":
+          reply = await cmdAssignTables(env, chatId);
+          break;
+        case "resultsubmit":
+          reply = await cmdResultSubmit(env, chatId, text);
+          break;
+        case "resultfinalize":
+          reply = await cmdResultFinalize(env, chatId);
           break;
         default:
           reply =
