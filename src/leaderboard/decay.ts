@@ -7,8 +7,6 @@ const WARNING_THRESHOLD = 23 * DAY; // 1 week before 30 days
 
 export async function runDecay(env: Env): Promise<void> {
     const now = Date.now();
-    const decayCutoff = now - THIRTY_DAYS;
-    const warningCutoff = now - WARNING_THRESHOLD;
 
     // Fetch all leaderboard rows
     const res = await env.DB.prepare(

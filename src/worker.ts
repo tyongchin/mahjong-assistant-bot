@@ -20,6 +20,8 @@ import { cmdResultSubmit } from "./commands/resultsubmit";
 import { cmdResultFinalize } from "./commands/resultfinalize";
 import { cmdSetPoints } from "./commands/setpoints";
 import { cmdLeaderboard } from "./commands/leaderboard";
+import { cmdGuestAdd } from "./commands/guestadd";
+import { cmdGuestRemove } from "./commands/guestremove";
 
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -104,7 +106,12 @@ export default {
             case "setpoints":
                 reply = await cmdSetPoints(env, chatId, userId, text);
                 break;
-            
+            case "guestadd":
+                reply = await cmdGuestAdd(env, chatId, text);
+                break;
+            case "guestremove":
+                reply = await cmdGuestRemove(env, chatId, text);
+                break;
             default:
                 reply =
                 "Commands:\n" +

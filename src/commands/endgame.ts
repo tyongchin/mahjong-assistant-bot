@@ -8,7 +8,7 @@ export async function cmdEndGame(
 
   const sessionId = await getActiveSessionId(env, chatId);
   if (sessionId === null)
-    return ["No active session. Use /newgame."];
+    return ["No active session. 😭 Use /newgame."];
 
   const players = await listPlayers(env, sessionId);
 
