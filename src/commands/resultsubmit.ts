@@ -76,14 +76,14 @@ export async function cmdResultSubmit(env: Env, chatId: string, rawText: string)
         out += `\nUnrecognized usernames (bot hasn't learned them yet):\n- ${unknownUsers.join("\n- ")}`;
     }
     if (notInSession.length > 0) {
-        out += `\n\nThese users are not in this session:\n- ${notInSession.join("\n- ")}`;
+        out += `\nThese users are not in this session:\n- ${notInSession.join("\n- ")}`;
     }
     if (missing.length > 0) {
-        out += `\n\nMissing players (not provided in your submission):\n- ${missing.join("\n- ")}`;
+        out += `\nMissing players (not provided in your submission):\n- ${missing.join("\n- ")}`;
     }
 
     if (net !== 0) {
-        out += `\n\n⚠️ Totals don’t sum to 0. Net = ${formatSigned(net)}.\n`;
+        out += `\n⚠️ Totals don’t sum to 0. Net = ${formatSigned(net)}.\n`;
         if (net > 0) out += `You have ${formatSigned(net)} extra (someone needs to lose ${net}).\n`;
         else out += `You are missing +${Math.abs(net)} (someone needs to win ${Math.abs(net)}).\n`;
 

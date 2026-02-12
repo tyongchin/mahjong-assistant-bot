@@ -13,63 +13,54 @@ export function computeSessionPointsFromBalances(
   balances: BalanceEntry[],
   resolveUserMeta: (id: string) => { username: string | null; displayName: string | null }
 ): PointsDelta[] {
-
   const winners = balances.filter(b => b.balance > 0);
   const losers  = balances.filter(b => b.balance < 0);
 
+  // Start everyone at 0 so neutral players are included
   const map = new Map<string, PointsDelta>();
+  for (const b of balances) {
+    const meta = resolveUserMeta(b.id);
+    map.set(b.id, {
+      userId: b.id,
+      username: meta.username,
+      displayName: meta.displayName,
+      deltaPoints: 0,
+      reason: "played(0)"
+    });
+  }
 
   // Base points
   for (const w of winners) {
-    const meta = resolveUserMeta(w.id);
-    map.set(w.id, {
-      userId: w.id,
-      username: meta.username,
-      displayName: meta.displayName,
-      deltaPoints: 1,
-      reason: "winner(+1)"
-    });
+    const cur = map.get(w.id)!;
+    cur.deltaPoints += 1;
+    cur.reason = "winner(+1)";
   }
 
   for (const l of losers) {
-    const meta = resolveUserMeta(l.id);
-    map.set(l.id, {
-      userId: l.id,
-      username: meta.username,
-      displayName: meta.displayName,
-      deltaPoints: -1,
-      reason: "loser(-1)"
-    });
+    const cur = map.get(l.id)!;
+    cur.deltaPoints -= 1;
+    cur.reason = "loser(-1)";
   }
 
-  // Top winner bonus
+  // Top winner bonus (+1 extra)
   if (winners.length > 0) {
     const max = Math.max(...winners.map(w => w.balance));
-    const topWinners = winners.filter(w => w.balance === max);
-
-    for (const tw of topWinners) {
-      const cur = map.get(tw.id);
-      if (cur) {
-        cur.deltaPoints += 1;
-        cur.reason += ",topWinnerBonus(+1)";
-      }
+    for (const tw of winners.filter(w => w.balance === max)) {
+      const cur = map.get(tw.id)!;
+      cur.deltaPoints += 1;
+      cur.reason += cur.reason.includes("winner") ? ",topWinnerBonus(+1)" : "topWinnerBonus(+1)";
     }
   }
 
-  // Top loser bonus
+  // Top loser bonus (-1 extra)
   if (losers.length > 0) {
-    const min = Math.min(...losers.map(l => l.balance)); // most negative
-    const topLosers = losers.filter(l => l.balance === min);
-
-    for (const tl of topLosers) {
-      const cur = map.get(tl.id);
-      if (cur) {
-        cur.deltaPoints -= 1;
-        cur.reason += ",topLoserBonus(-1)";
-      }
+    const min = Math.min(...losers.map(l => l.balance));
+    for (const tl of losers.filter(l => l.balance === min)) {
+      const cur = map.get(tl.id)!;
+      cur.deltaPoints -= 1;
+      cur.reason += cur.reason.includes("loser") ? ",topLoserBonus(-1)" : "topLoserBonus(-1)";
     }
   }
 
-  // Remove zero changes (e.g. if someone had 0 balance)
-  return [...map.values()].filter(x => x.deltaPoints !== 0);
+  return [...map.values()];
 }

@@ -19,6 +19,7 @@ import { cmdShuffleTables } from "./commands/shuffletables";
 import { cmdResultSubmit } from "./commands/resultsubmit";
 import { cmdResultFinalize } from "./commands/resultfinalize";
 import { cmdSetPoints } from "./commands/setpoints";
+import { cmdLeaderboard } from "./commands/leaderboard";
 
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -97,21 +98,26 @@ export default {
             case "resultfinalize":
                 reply = await cmdResultFinalize(env, chatId);
                 break;
+            case "leaderboard":
+                reply = await cmdLeaderboard(env, chatId);
+                break;
             case "setpoints":
                 reply = await cmdSetPoints(env, chatId, userId, text);
                 break;
+            
             default:
                 reply =
                 "Commands:\n" +
                 "/newgame - start a session\n" +
                 "/join - join session\n" +
                 "/leave - leave session\n" +
-                "/status - show current players\n" +
+                "/status - show current players for session\n" +
                 "/add - add player\n" +
                 "/remove - remove player\n" +
-                "/shuffletables - assign tables\n" +
+                "/shuffletables - shuffle tables\n" +
                 "/resultsubmit - submit results\n" +
-                "/endgame - end session";
+                "/endgame - end session" +"\n" +
+                "/leaderboard - show leaderboard";
                 break;
             }
         } catch (e) {
