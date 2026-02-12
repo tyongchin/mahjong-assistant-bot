@@ -29,3 +29,12 @@ export type AutoBalanceResult = {
   appliedNet: number; // how much was redistributed (abs(netBefore), unless impossible)
   note: string | null;
 };
+
+// Leaderboard points types
+export type PointsDelta = {
+  userId: string;
+  username: string | null;
+  displayName: string | null;
+  deltaPoints: number;
+  reason: string;
+};

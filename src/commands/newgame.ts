@@ -1,5 +1,6 @@
 import type { Env } from "../types/env";
 import { createSession, getActiveSessionId } from "../db/sessions";
+import { parseTitle } from "../utils/parse";
 
 export async function cmdNewGame(
   env: Env,
@@ -23,10 +24,4 @@ export async function cmdNewGame(
   return `🀄 New mahjong session started! (session #${id})\nUse /join to join.`;
 }
 
-function parseTitle(rawText: string): string | null {
-  const parts = rawText.trim().split(/\s+/);
-  if (parts.length <= 1) return null;
 
-  // Remove "/newgame" (first word) and join the rest
-  return rawText.trim().substring(rawText.indexOf(" ") + 1).trim();
-}
