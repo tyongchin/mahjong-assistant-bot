@@ -40,7 +40,7 @@ export async function cmdFinalize(env: Env, chatId: string): Promise<string> {
     // Build balances (raw from draft; missing treated as 0)
     const entries: BalanceEntry[] = [];
     for (const p of sessionPlayers) {
-        const name = p.username ? `${p.username}` : (p.display_name ?? "Unknown");
+        const name = formatName(p);
         const delta = byUserId.get(p.user_id) ?? 0;
         entries.push({ id: p.user_id, name, balance: delta });
     }
