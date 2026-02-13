@@ -73,7 +73,7 @@ Guests:
 
 ### Step 2 — Submit Results
 
-- `/resultsubmit`
+- `/endgame`
 ```
 /resultsubmit
 alice 12
@@ -93,7 +93,7 @@ Rules:
 
 ### Step 3 — Finalize
 
-- `/resultfinalize`
+- `/finalize`
 
 On finalize:
 - Auto-balances missing/extra money proportionally

@@ -8,7 +8,7 @@ import { formatName, formatSigned } from "../utils/format";
 import { computeSessionPointsFromBalances } from "../leaderboard/points";
 import { applyPointsBatch } from "../db/leaderboard";
 
-export async function cmdResultFinalize(env: Env, chatId: string): Promise<string> {
+export async function cmdFinalize(env: Env, chatId: string): Promise<string> {
     // Allow finalize even if /endgame wasn't called
     let state = await getResultState(env, chatId);
 

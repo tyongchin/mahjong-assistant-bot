@@ -16,8 +16,7 @@ import { cmdStatus } from "./commands/status";
 import { cmdAdd } from "./commands/add";
 import { cmdRemove } from "./commands/remove";
 import { cmdShuffleTables } from "./commands/shuffletables";
-import { cmdResultSubmit } from "./commands/resultsubmit";
-import { cmdResultFinalize } from "./commands/resultfinalize";
+import { cmdFinalize } from "./commands/finalize";
 import { cmdSetPoints } from "./commands/admin/setpoints";
 import { cmdLeaderboard } from "./commands/leaderboard";
 import { cmdGuestAdd } from "./commands/guestadd";
@@ -75,7 +74,7 @@ export default {
                 reply = await cmdNewGame(env, chatId, userId, text);
                 break;
             case "endgame":
-                reply = await cmdEndGame(env, chatId);
+                reply = await cmdEndGame(env, chatId, text);
                 break;
             case "join":
                 reply = await cmdJoin(env, chatId, userId, username, displayName);
@@ -95,11 +94,8 @@ export default {
             case "shuffletables":
                 reply = await cmdShuffleTables(env, chatId);
                 break;
-            case "resultsubmit":
-                reply = await cmdResultSubmit(env, chatId, text);
-                break;
-            case "resultfinalize":
-                reply = await cmdResultFinalize(env, chatId);
+            case "finalize":
+                reply = await cmdFinalize(env, chatId);
                 break;
             case "leaderboard":
                 reply = await cmdLeaderboard(env, chatId);
