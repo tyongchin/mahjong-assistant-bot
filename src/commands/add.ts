@@ -1,6 +1,6 @@
 import type { Env } from "../types/env";
 import { getActiveSessionId, addPlayerToSession, countPlayers } from "../db/sessions";
-import { getUserIdByUsername, normalizeUsername } from "../db/players";
+import { getDisplayNameByUserId, getUserIdByUsername, normalizeUsername } from "../db/players";
 import { parseSingleUsernameArg } from "../utils/parse";
 import { getResultState } from "../db/results";
 
@@ -25,17 +25,19 @@ export async function cmdAdd(
 
     if (!targetUserId) {
         return (
-        `I don't recognize @${uname} yet.\n` +
+        `I don't recognize ${uname} yet.\n` +
         `Ask them to send any message in this group (or /join once) so I can learn their username.`
         );
     }
 
+    const displayName = await getDisplayNameByUserId(env, targetUserId) || uname;
+
     // We don't know their latest display name here unless stored; use @username as display_name fallback.
-    await addPlayerToSession(env, sessionId, targetUserId, uname, `@${uname}`);
+    await addPlayerToSession(env, sessionId, targetUserId, uname, displayName);
     
     const c = await countPlayers(env, sessionId);
 
-    return `🥳 Added ${uname} to session #${sessionId}.\nCurrent players: ${c}\nUse /status to see the list.`;
+    return `🥳 Added ${displayName} to session #${sessionId}.\nCurrent players: ${c}\nUse /status to see the list.`;
 }
 
 

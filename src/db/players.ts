@@ -38,6 +38,14 @@ export async function getUserIdByUsername(env: Env, username: string): Promise<s
     return row ? row.user_id : null;
 }
 
+export async function getDisplayNameByUserId(env: Env, userId: string): Promise<string | null> {
+    const row = await env.DB
+        .prepare(`SELECT display_name FROM players WHERE user_id = ? LIMIT 1`)
+        .bind(userId)
+        .first<{ display_name: string }>();
+    return row ? row.display_name : null;
+}
+
 export function normalizeUsername(username: string): string {
     // store lowercase, without leading '@'
     return username.trim().replace(/^@+/, "").toLowerCase();

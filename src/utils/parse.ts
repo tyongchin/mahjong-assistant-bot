@@ -40,7 +40,7 @@ export function parseSubmit(rawText: string): ParsedLine[] {
     if (lines.length === 0) return [];
 
     const head = lines[0].split(/\s+/)[0];
-    if (!head.startsWith("/resultsubmit")) return [];
+    if (!head.startsWith("/endgame")) return [];
 
     const out: ParsedLine[] = [];
 
