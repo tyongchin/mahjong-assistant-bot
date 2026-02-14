@@ -66,7 +66,9 @@ export default {
         const username = msg.from.username ? String(msg.from.username) : null;
         const displayName = makeDisplayName(msg.from);
 
-        let reply: string | string[] | null = null;
+        type OutMsg = { text: string; parseMode?: "Markdown" };
+        type Reply = string | string[] | OutMsg | OutMsg[] | null;
+        let reply: Reply = null;
 
         try {
             switch (command) {
@@ -95,10 +97,16 @@ export default {
                 reply = await cmdShuffleTables(env, chatId);
                 break;
             case "finalize":
+                reply = [
+                    { text: await cmdFinalize(env, chatId) },
+                    { text: await cmdLeaderboard(env, chatId), parseMode: "Markdown" },
+                ];
+                break;
+            case "finalise": // common misspelling
                 reply = await cmdFinalize(env, chatId);
                 break;
             case "leaderboard":
-                reply = await cmdLeaderboard(env, chatId);
+                reply = { text: await cmdLeaderboard(env, chatId), parseMode: "Markdown" };
                 break;
             case "guestadd":
                 reply = await cmdGuestAdd(env, chatId, text);
@@ -123,17 +131,22 @@ export default {
         }
         
         if (reply !== null) {
-            ctx.waitUntil(
-                (async () => {
-                if (Array.isArray(reply)) {
-                    for (const r of reply) {
-                    await sendMessage(env, msg.chat.id, r);
+            ctx.waitUntil((async () => {
+                const sendOne = async (m: string | OutMsg) => {
+                    if (typeof m === "string") {
+                        await sendMessage(env, msg.chat.id, m);
+                    } 
+                    else {
+                        await sendMessage(env, msg.chat.id, m.text, m.parseMode);
                     }
-                } else {
-                    await sendMessage(env, msg.chat.id, reply);
+                    };
+                    if (Array.isArray(reply)) {
+                        for (const r of reply) await sendOne(r);
+                    } 
+                    else {
+                        await sendOne(reply);
                 }
-                })()
-            );
+            })());
         }
         return new Response("ok", { status: 200 });
     },

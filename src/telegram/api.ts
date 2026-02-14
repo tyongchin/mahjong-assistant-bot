@@ -1,15 +1,33 @@
 import type { Env } from "../types/env";
 
-export async function sendMessage(env: Env, chatId: number, text: string): Promise<void> {
-    const resp = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
-    });
+export async function sendMessage(
+  env: Env,
+  chatId: number,
+  text: string,
+  parseMode?: "Markdown"
+): Promise<void> {
+    const body: any = {
+        chat_id: chatId,
+        text,
+    };
+
+    // Only attach parse_mode if explicitly requested
+    if (parseMode) {
+        body.parse_mode = parseMode;
+    }
+
+    const resp = await fetch(
+        `https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        }
+    );
 
     if (!resp.ok) {
-      const body = await resp.text();
-      console.log("Telegram sendMessage failed:", resp.status, body);
+        const errBody = await resp.text();
+        console.log("Telegram sendMessage failed:", resp.status, errBody);
     }
 }
 
@@ -42,7 +60,7 @@ export async function isAuthorized(
         }
     );
 
-    const data = await resp.json();
+    const data = await resp.json() as { ok: boolean; result?: { status: string } };
     if (!data.ok) return false;
     const status = data.result?.status;
     return status === "creator" || status === "administrator";
