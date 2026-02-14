@@ -7,6 +7,7 @@ import { autoBalanceToZero } from "../settlement/autobalance";
 import { formatName, formatSigned } from "../utils/format";
 import { computeSessionPointsFromBalances } from "../leaderboard/points";
 import { applyPointsBatch } from "../db/leaderboard";
+import { cmdLeaderboard } from "./leaderboard";
 
 export async function cmdFinalize(env: Env, chatId: string): Promise<string> {
     // Allow finalize even if /endgame wasn't called
@@ -91,11 +92,8 @@ export async function cmdFinalize(env: Env, chatId: string): Promise<string> {
         for (const t of transfers) out += `- ${t.from} pays ${t.to} ${t.amount}\n`;
     }
 
-    out += `\n\n📈 Leaderboard update:\n`;
-    for (const d of deltas) {
-        const nm = formatName(d);
-        out += `- ${nm}: ${formatSigned(d.delta_points)}\n`;
-    }
+    const leaderboardOutput = await cmdLeaderboard(env, chatId);
+    out += `\n\n${leaderboardOutput}`;
 
     // END THE SESSION HERE (single source of truth)
     await env.DB.prepare(`UPDATE sessions SET status = 'ended' WHERE id = ?`)
