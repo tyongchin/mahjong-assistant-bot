@@ -92,9 +92,6 @@ export async function cmdFinalize(env: Env, chatId: string): Promise<string> {
         for (const t of transfers) out += `- ${t.from} pays ${t.to} ${t.amount}\n`;
     }
 
-    const leaderboardOutput = await cmdLeaderboard(env, chatId);
-    out += `\n\n${leaderboardOutput}`;
-
     // END THE SESSION HERE (single source of truth)
     await env.DB.prepare(`UPDATE sessions SET status = 'ended' WHERE id = ?`)
         .bind(sessionId)
